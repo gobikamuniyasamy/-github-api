@@ -1,20 +1,30 @@
 function git() {
+    var username = document.getElementById("text").value;
+    var resultDiv = document.getElementById("result");
 
-    var orignalName =document.getElementById("text").value;
+    if (username === "") {
+        resultDiv.innerHTML = "Please enter a username.";
+        return;
+    }
+
+    var url = `https://api.github.com/users/${username}`;
     
-    console.log(orignalName);
-    
-    fetch("https://api.github.com/users/" + orignalName)
-    
-    .then((result) => result.json())
-    
-    .then((data) => {
-    
-    console.log(data);
-    
-    document.getElementById(
-    
-    "result"
-    ).innerHTML=`<img src="${data.avatar_url}" alt="user_avatar"><br>${data.login}<br><h1>Total Repo: ${data.public_repos}</h1>`;
-});
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            resultDiv.innerHTML = `
+                <h2>${data.name}</h2>
+                <p>${data.bio}</p>
+                <img src="${data.avatar_url}" alt="Avatar">
+            `;
+        })
+        .catch(error => {
+            resultDiv.innerHTML = "User not found or an error occurred.";
+            console.error('There has been a problem with your fetch operation:', error);
+        });
 }
